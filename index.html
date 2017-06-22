@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <title>Local Weather App</title>
+    <link rel="stylesheet" href="css/bootstrap.css"/>
+    <link rel="stylesheet" href="css/weather-icons.css">
+    <link rel="stylesheet" href="css/app.css"/>
+  </head>
+    
+  <body>
+    <h1>AngularJS Weather App</h1>
+    <p>Uses AngularJS, <a href="https://erikflowers.github.io/weather-icons/" target="_blank">Weather Icons</a> and <a href="http://openweathermap.org/" target="_blank">Open Weather Map API</a> to create a simple weather card, initially based on user location, but can be over-ridden by the input below.</p>  
+    <p>If you take a look at the markup, the icons are based on a range of <a href="http://openweathermap.org/weather-conditions" target="_blank">weather IDs</a> from Open Weather Map, so this could obviously get more specific.</p>
+    <p>The background colour of the card is controlled using <code>ng-class</code> based on the temperature.</p>
+    <div ng-app="weatherApp">
+      <div ng-controller="weatherController as weather"> 
+        <form ng-submit="refresh()">
+          <input type="text" ng-model="location" placeholder="Type and hit enter to update location"/>
+        </form>
+        <div class="key">
+          <h3>Key: <span class="cool">Cool</span> | <span class="mid">Mild</span> | <span class="hot">Hot</span></h3>
+        </div>
+            
+        <h2 class="error" ng-show="!weatherData.name">{{weatherData.message}}</h2>
+        <h2 class="loading">Loading...</h2>
+
+        <div ng-if="weatherData.name" class="card" ng-class="{hot: weatherData.main.temp - 273 >= 23, mid: weatherData.main.temp - 273 > 15, cool: weatherData.main.temp - 273 < 15 }">
+          <h2>{{weatherData.name}}, {{weatherData.sys.country}}</h2>          
+              
+          <div class="icon">
+            <!-- Clear Sky -->
+            
+            <!-- Day -->
+            <i ng-if="weatherData.weather[0].id == 800 && weatherData.dt < weatherData.sys.sunset" class="wi wi-day-sunny"></i>  
+            
+            <!-- Night -->
+            <i ng-if="weatherData.weather[0].id == 800 && weatherData.dt > weatherData.sys.sunset" class="wi wi-night-clear"></i>              
+              
+            <!-- Cloudy -->
+            <i ng-if="weatherData.weather[0].id >= 801 && weatherData.weather[0].id <= 804 && weatherData.dt < weatherData.sys.sunset && weatherData.clouds.all < 50" class="wi wi-day-cloudy"></i>  
+              
+            <i ng-if="weatherData.weather[0].id >= 801 && weatherData.weather[0].id <= 804 && weatherData.dt > weatherData.sys.sunset && weatherData.clouds.all < 50" class="wi wi-night-cloudy"></i> 
+              
+            <i ng-if="weatherData.weather[0].id >= 801 && weatherData.weather[0].id <= 804 && weatherData.clouds.all >= 50" class="wi wi-cloudy"></i> 
+              
+            <!-- Drizzle -->
+            <i ng-if="weatherData.weather[0].id >= 300 && weatherData.weather[0].id <= 321 && weatherData.dt < weatherData.sys.sunset && weatherData.clouds.all < 50" class="wi wi-day-rain-mix"></i>  
+              
+            <i ng-if="weatherData.weather[0].id >= 300 && weatherData.weather[0].id <= 321 && weatherData.dt > weatherData.sys.sunset && weatherData.clouds.all < 50" class="wi wi-night-alt-rain-mix"></i> 
+              
+            <i ng-if="weatherData.weather[0].id >= 300 && weatherData.weather[0].id <= 321 && weatherData.clouds.all >= 50" class="wi wi-rain-mix"></i>
+              
+            <!-- Rain -->
+            <i ng-if="weatherData.weather[0].id >= 500 && weatherData.weather[0].id <= 531 && weatherData.dt < weatherData.sys.sunset && weatherData.clouds.all < 50" class="wi wi-day-rain"></i>  
+              
+            <i ng-if="weatherData.weather[0].id >= 500 && weatherData.weather[0].id <= 531 && weatherData.dt > weatherData.sys.sunset && weatherData.clouds.all < 50" class="wi wi-night-rain"></i> 
+              
+            <i ng-if="weatherData.weather[0].id >= 500 && weatherData.weather[0].id <= 531 && weatherData.clouds.all >= 50" class="wi wi-rain"></i>
+              
+            <!-- Snow -->
+            <i ng-if="weatherData.weather[0].id >= 600 && weatherData.weather[0].id <= 622 && weatherData.dt < weatherData.sys.sunset && weatherData.clouds.all < 50" class="wi wi-day-snow"></i>  
+              
+            <i ng-if="weatherData.weather[0].id >= 600 && weatherData.weather[0].id <= 622 && weatherData.dt > weatherData.sys.sunset && weatherData.clouds.all < 50" class="wi wi-night-snow"></i> 
+              
+            <i ng-if="weatherData.weather[0].id >= 600 && weatherData.weather[0].id <= 622 && weatherData.clouds.all >= 50" class="wi wi-snow"></i>
+              
+            <!-- Thunder Storms -->
+            <i ng-if="weatherData.weather[0].id >= 200 && weatherData.weather[0].id <= 232 && weatherData.dt < weatherData.sys.sunset && weatherData.clouds.all < 50" class="wi wi-day-thunderstorm"></i>  
+              
+            <i ng-if="weatherData.weather[0].id >= 200 && weatherData.weather[0].id <= 232 && weatherData.dt > weatherData.sys.sunset && weatherData.clouds.all < 50" class="wi wi-night-thunderstorm"></i> 
+              
+            <i ng-if="weatherData.weather[0].id >= 200 && weatherData.weather[0].id <= 232 && weatherData.clouds.all >= 50" class="wi wi-thunderstorm"></i>
+              
+            <!-- Mist and Fog -->              
+            <i ng-if="weatherData.weather[0].id >= 701 && weatherData.weather[0].id <= 781" class="wi wi-fog"></i>
+              
+          </div>
+              
+          <p class="info">
+            <h3>{{weatherData.main.temp - 273 | number:0}}&deg;C</h3>{{weatherData.weather[0].main}}: {{weatherData.weather[0].description}}
+          </p>
+        </div>            
+      </div>
+    </div>
+    <script src="lib/angular.min.js" charset="utf-8"></script>
+    <script src="lib/bootstrap.min.js" charset="utf-8"></script>
+    <script src="lib/jquery.min.js" charset="utf-8"></script>
+    <script src="lib/modernizr.min.js" charset="utf-8"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
